@@ -1,0 +1,115 @@
+
+<html>
+
+<head>
+    <title>Blog AP</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+
+    <script type="text/javascript" src="assets/js/jquery-3.2.1.js"></script>
+    <script type="text/javascript" src="assets/js/login-api.js"></script>
+    <script type="text/javascript" src="assets/js/logout.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $("#btnSalir").click(() => {
+
+                var token = window.localStorage.getItem("token");
+                loginApi.logout(token)
+                    .then(function (data) {
+                        window.localStorage.removeItem("token");
+                        window.location = "login.html";
+                    })
+                    .catch(error => console.log(error));
+            });
+
+
+
+            //Cargamos Tabla
+            var posteos = $("#posteos");
+            var token = window.localStorage.getItem("token");
+
+            if (token == null) {
+                window.location = "login.html";
+            }
+            $.ajax({
+                method: 'GET',
+                url: "http://localhost:8080/post",
+                headers: { 'Authorization': 'Bearer ' + token },
+                success: function (post) {
+                    $.each(post, function (i, posts) {
+                        posteos.append('<div class="container"><table><td><h5>' + posts.title + '</h5> <p>By: ' + posts.userId + '</p> ' + posts.body + '</td></table><hr style="color: #0056b2;"></div>');
+                    });
+                }
+
+            });
+            $.ajax({
+                method: 'GET',
+                url: "http://localhost:8080/post",
+                headers: { 'Authorization': 'Bearer ' + token },
+                success: function (users) {
+                    $.each(post, function (i, post) {
+
+                        users.array.forEach(user => {
+                            if (user.id === post.userId){
+                                post.name = user.name;
+                                post.email = user.email;
+                            }
+                            
+                        });
+                        posteos.append('<div class="container"><table><td><h5>' + post.title + '</h5> <p>By: ' + post.name + '(' + '</p> ' + post.body + '</td></table><hr style="color: #0056b2;"></div>');
+                    });
+                }
+
+            });
+
+        });
+
+
+    </script>
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <br>
+                <div>
+                    <h1>
+                        <span>Post</span>
+                    </h1>
+                </div>
+                <div>
+                    <p class="text-right">
+                        <button id="btnSalir">LogOut</button>
+                    </p>
+                </div>
+                <div>
+                    <p class="text-right">
+                            <a href="register.html"> Comentarios </a>
+                    </p>
+                </div>
+                <div class="col-md-12">
+                    <br>
+                    <br>
+                    <table class="table">
+                        <tbody id="posteos">
+
+                        </tbody>
+
+                        <tbody id="comentarios">
+
+                        </tbody>
+                        <colgroup>
+                            <col style="background:pink">
+                            <col span="2" style="background:yellow">
+                        </colgroup>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
